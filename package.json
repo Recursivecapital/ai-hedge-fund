@@ -1,0 +1,21 @@
+{
+  "name": "ai-hedge-fund",
+  "version": "1.0.0",
+  "description": "AI Hedge Fund project",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:web\" \"npm run dev:api\"",
+    "dev:web": "cd web && npm run dev",
+    "dev:api": "cd api && poetry run uvicorn src.main:app --reload --port 8000",
+    "build:web": "cd web && npm run build",
+    "git:push": "git add . && git commit -m \"Update application\" && git push origin main"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Recursivecapital/ai-hedge-fund.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+} 
