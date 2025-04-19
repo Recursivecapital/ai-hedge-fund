@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Services that interface with existing Python code without modification
   - Utility functions for data transformation
 
+### Changed
+- Updated web development guidelines with Todo List Management section
+- Converted todo list from .mdc to .md format for better compatibility
+- Updated Phase 2 items in todo list as completed
+
 ## [0.1.0] - 2024-11-13
 
 ### Added

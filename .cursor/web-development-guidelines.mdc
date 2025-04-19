@@ -103,30 +103,56 @@ ai-hedge-fund/
    - Notification settings
 
 ## Development Workflow
-1. Feature Development
-   ```bash
-   git checkout -b feature/web/feature-name
-   cd web
-   pnpm dev
-   ```
 
-2. Testing
-   - Write unit tests
-   - Run integration tests
-   - Perform E2E testing
-   - Check accessibility
+### Feature Development
+- Each feature branch should be named after the feature being developed (e.g., `feature/agent-dashboard`)
+- Create a new branch from `main` for each feature
+- Commit frequently with descriptive messages
+- Push changes to the remote repository regularly
 
-3. Code Quality
-   - Run ESLint
-   - Check TypeScript types
-   - Format with Prettier
-   - Review bundle size
+### Testing
+- Write unit tests for all new functionality
+- Ensure all tests pass before submitting a pull request
+- Test both API endpoints and UI components
+- Use Jest for frontend tests and Pytest for backend tests
 
-4. Deployment
-   - Build optimization
-   - Environment validation
-   - Performance testing
-   - Security checks
+### Code Quality
+- Follow ESLint and Prettier configurations
+- Run linting before committing code
+- Address all warnings and errors
+- Conduct code reviews for all pull requests
+
+### Deployment
+- Use CI/CD pipeline for automated testing and deployment
+- Stage changes in a development environment before production
+- Follow the deployment checklist in the documentation
+- Monitor deployments for any issues
+
+### Documentation
+- Update API documentation for any new or changed endpoints
+- Document all new components with JSDoc comments
+- Update the README.md as needed
+- Keep the CHANGELOG.md up to date
+
+### Monitoring
+- Set up logging for all critical operations
+- Monitor performance metrics
+- Track error rates and user interactions
+- Set up alerts for critical issues
+
+### Todo List Management and GitHub Workflow
+- Before marking a task as complete in the todo list, ensure it's properly tested
+- When completing a task:
+  1. Test the feature thoroughly in your local environment
+  2. Update the todo list in `.cursor/todo-list.md` by marking the task as complete
+  3. Add an entry to the CHANGELOG.md under the appropriate section
+  4. Commit changes with a descriptive message following the format: `[Feature] Complete <task name>`
+  5. Push changes to GitHub only after verification that the feature works as expected
+  6. Create a pull request if working on a feature branch
+  7. Request a code review from at least one team member
+- Never push incomplete or untested features to the main branch
+- When in doubt about a feature's completion status, mark it as in-progress rather than complete
+- Regularly sync your local repository with the remote to stay updated with team progress
 
 ## Documentation
 - Document all components
