@@ -1,1 +1,125 @@
- 
+---
+description: 
+globs: 
+alwaysApply: false
+---
+ # AI Hedge Fund Repository Rules and Configuration
+
+## Repository Structure
+- Origin: https://github.com/Recursivecapital/ai-hedge-fund (fork)
+- Upstream: https://github.com/virattt/ai-hedge-fund (original)
+
+## Git Workflow Rules
+
+### 1. Branch Management
+- Main branch: `main`
+- Feature branches: `feature/*`
+- Bugfix branches: `bugfix/*`
+- Hotfix branches: `hotfix/*`
+
+### 2. Syncing with Upstream
+```bash
+# Fetch upstream changes
+git fetch upstream
+
+# Merge upstream changes
+git merge upstream/main
+# OR use rebase for cleaner history
+git rebase upstream/main
+
+# Push to origin
+git push origin main
+```
+
+### 3. Development Workflow
+1. Create feature branch from main
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+2. Make changes and commit
+3. Push to origin
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+4. Create Pull Request to main
+
+### 4. Code Style
+- Use Black for Python code formatting
+- Follow PEP 8 guidelines
+- Use type hints
+- Write docstrings for all functions and classes
+
+### 5. Dependencies
+- Use Poetry for dependency management
+- Keep `pyproject.toml` and `poetry.lock` in sync
+- Document new dependencies in README.md
+
+### 6. Environment
+- Use `.env` for environment variables
+- Never commit `.env` file (it's in .gitignore)
+- Keep `.env.example` updated with new variables
+
+### 7. Testing
+- Write tests for new features
+- Run tests before committing
+- Maintain test coverage
+
+### 8. Documentation
+- Update README.md for new features
+- Document API changes
+- Keep inline comments meaningful and up-to-date
+
+### 9. Commit Messages
+- Use conventional commits format
+- Include ticket/issue numbers if applicable
+- Be descriptive but concise
+
+### 10. Security
+- Never commit API keys or secrets
+- Use environment variables for sensitive data
+- Regular security updates for dependencies
+
+## IDE Configuration
+- Use Python 3.11+
+- Enable auto-formatting on save
+- Enable type checking
+- Enable linting (flake8)
+
+## Project-Specific Rules
+1. AI Agents
+   - Follow the agent interface
+   - Document agent strategies
+   - Include risk management
+   - Test with multiple scenarios
+
+2. Trading Logic
+   - Validate all calculations
+   - Include position sizing rules
+   - Document risk parameters
+   - Test edge cases
+
+3. Data Handling
+   - Validate input data
+   - Handle API rate limits
+   - Cache when appropriate
+   - Error handling for missing data
+
+## Contribution Guidelines
+1. Fork the repository
+2. Create feature branch
+3. Make changes
+4. Run tests
+5. Submit pull request
+6. Wait for review
+
+## Deployment
+- Test in simulation mode first
+- Validate API connections
+- Check rate limits
+- Monitor system resources
+
+## Maintenance
+- Regular dependency updates
+- Performance monitoring
+- Error logging
+- Backup strategies
