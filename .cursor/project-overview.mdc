@@ -3,4 +3,191 @@ description:
 globs: 
 alwaysApply: false
 ---
- 
+# AI Hedge Fund - Detailed Project Overview
+
+## Project Vision
+The AI Hedge Fund is an innovative proof-of-concept that leverages artificial intelligence to make sophisticated trading decisions. By emulating the strategies of legendary investors and combining them with modern quantitative analysis, the system aims to demonstrate how AI can be applied to investment management.
+
+## System Architecture
+
+### 1. Core Components
+```
+src/
+├── agents/        # Investment strategy agents
+├── llm/          # Language model integrations
+├── data/         # Data management and processing
+├── tools/        # Utility tools and helpers
+├── graph/        # Decision flow graphs
+└── utils/        # Common utilities
+```
+
+### 2. Agent System
+The system employs a multi-agent architecture with 15 specialized agents:
+
+#### Value Investing Agents
+1. **Ben Graham Agent**
+   - Focus: Hidden gems with margin of safety
+   - Methodology: Deep value analysis
+   - Metrics: Book value, P/E ratio, debt levels
+
+2. **Warren Buffett Agent**
+   - Focus: Wonderful companies at fair prices
+   - Methodology: Competitive advantage analysis
+   - Metrics: ROIC, moat strength, management quality
+
+3. **Charlie Munger Agent**
+   - Focus: High-quality businesses
+   - Methodology: Mental models application
+   - Metrics: Business quality, management integrity
+
+#### Growth Investing Agents
+4. **Cathie Wood Agent**
+   - Focus: Disruptive innovation
+   - Methodology: Technology trend analysis
+   - Metrics: TAM, innovation potential, growth rate
+
+5. **Phil Fisher Agent**
+   - Focus: High-quality growth
+   - Methodology: Scuttlebutt research
+   - Metrics: R&D efficiency, growth sustainability
+
+6. **Peter Lynch Agent**
+   - Focus: "Ten-baggers"
+   - Methodology: Growth at reasonable price
+   - Metrics: PEG ratio, earnings growth
+
+#### Activist/Special Situations
+7. **Bill Ackman Agent**
+   - Focus: Activist opportunities
+   - Methodology: Corporate governance analysis
+   - Metrics: Management effectiveness, restructuring potential
+
+8. **Michael Burry Agent**
+   - Focus: Market inefficiencies
+   - Methodology: Contrarian analysis
+   - Metrics: Hidden risks, market misconceptions
+
+#### Quantitative Agents
+9. **Valuation Agent**
+   - Focus: Intrinsic value calculation
+   - Methodology: Multi-factor valuation models
+   - Metrics: DCF, comparative analysis
+
+10. **Sentiment Agent**
+    - Focus: Market psychology
+    - Methodology: NLP on market data
+    - Metrics: Sentiment scores, momentum
+
+11. **Fundamentals Agent**
+    - Focus: Financial health
+    - Methodology: Ratio analysis
+    - Metrics: Financial ratios, growth rates
+
+12. **Technicals Agent**
+    - Focus: Price patterns
+    - Methodology: Technical analysis
+    - Metrics: Moving averages, momentum indicators
+
+#### Risk Management
+13. **Risk Manager**
+    - Focus: Portfolio risk control
+    - Methodology: Risk metrics calculation
+    - Metrics: VaR, volatility, correlation
+
+14. **Portfolio Manager**
+    - Focus: Portfolio optimization
+    - Methodology: Modern portfolio theory
+    - Metrics: Sharpe ratio, diversification
+
+15. **Stanley Druckenmiller Agent**
+    - Focus: Macro opportunities
+    - Methodology: Global macro analysis
+    - Metrics: Economic indicators, policy impacts
+
+### 3. Decision Making Process
+1. **Data Collection**
+   - Market data
+   - Financial statements
+   - Economic indicators
+   - News and sentiment
+
+2. **Analysis Phase**
+   - Each agent performs specialized analysis
+   - Agents generate confidence scores
+   - Risk assessment performed
+
+3. **Decision Synthesis**
+   - Portfolio Manager aggregates signals
+   - Risk Manager applies constraints
+   - Final positions determined
+
+4. **Execution**
+   - Position sizing calculated
+   - Orders generated
+   - Risk limits enforced
+
+### 4. Risk Management Framework
+- Position limits
+- Portfolio diversification
+- Stop-loss mechanisms
+- Correlation analysis
+- Volatility management
+
+### 5. Backtesting System
+- Historical performance analysis
+- Strategy validation
+- Risk metrics calculation
+- Performance attribution
+
+## Technology Stack
+1. **Core System**
+   - Python 3.11+
+   - Poetry for dependency management
+   - LangChain for agent orchestration
+   - Various LLM providers (OpenAI, Groq, Anthropic)
+
+2. **Data Processing**
+   - Pandas for data manipulation
+   - NumPy for numerical computations
+   - Financial APIs integration
+
+3. **Analysis**
+   - Custom analysis modules
+   - Technical indicators
+   - Statistical models
+   - Machine learning models
+
+## Development Methodology
+1. **Agent Development**
+   - Clear interface definition
+   - Strategy documentation
+   - Performance metrics
+   - Backtesting validation
+
+2. **System Integration**
+   - Modular architecture
+   - Clear communication protocols
+   - Error handling
+   - Performance optimization
+
+3. **Testing Framework**
+   - Unit tests
+   - Integration tests
+   - Strategy backtests
+   - Performance benchmarks
+
+## Future Roadmap
+1. **Enhanced Analysis**
+   - More sophisticated agents
+   - Advanced risk models
+   - Machine learning integration
+
+2. **System Improvements**
+   - Real-time processing
+   - Advanced visualization
+   - Performance optimization
+
+3. **Additional Features**
+   - More asset classes
+   - Custom strategy development
+   - Advanced portfolio optimization

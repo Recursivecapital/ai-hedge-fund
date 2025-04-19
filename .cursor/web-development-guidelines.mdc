@@ -1,1 +1,141 @@
- 
+---
+description: 
+globs: 
+alwaysApply: false
+---
+ # AI Hedge Fund Web Application Development Guidelines
+
+## Technology Stack
+- Framework: Next.js 14 (App Router)
+- Language: TypeScript
+- Styling: Tailwind CSS
+- Component Library: shadcn/ui
+- State Management: TanStack Query + Zustand
+- Form Handling: React Hook Form + Zod
+- Testing: Vitest + Testing Library
+- API: tRPC for type-safe API calls
+
+## Project Structure
+```
+ai-hedge-fund/
+├── src/           # Python backend (DO NOT MODIFY)
+├── web/           # Next.js frontend
+│   ├── app/      # Next.js app router pages
+│   ├── components/# React components
+│   │   ├── ui/   # shadcn components
+│   │   └── custom/# custom components
+│   ├── lib/      # Utility functions
+│   ├── styles/   # Global styles
+│   ├── types/    # TypeScript types
+│   └── api/      # API routes
+```
+
+## Strict Rules
+1. Backend Integration
+   - NEVER modify Python code in @src directory
+   - Create API wrappers around Python functionality
+   - Use environment variables for configuration
+   - Implement proper error handling for Python interactions
+
+2. Component Development
+   - Use TypeScript strictly (no any types)
+   - Follow Atomic Design principles
+   - Implement proper loading states
+   - Handle error boundaries
+   - Write unit tests for components
+
+3. State Management
+   - Use Zustand for global state
+   - Use TanStack Query for server state
+   - Implement proper caching strategies
+   - Handle optimistic updates
+
+4. Styling Guidelines
+   - Use Tailwind CSS classes only
+   - Follow shadcn/ui patterns
+   - Maintain dark/light mode support
+   - Use CSS variables for theming
+   - Keep responsive design in mind
+
+5. Performance Rules
+   - Implement proper code splitting
+   - Use Next.js Image component
+   - Optimize for Core Web Vitals
+   - Monitor bundle size
+   - Use proper caching strategies
+
+6. Security Guidelines
+   - Implement proper authentication
+   - Validate all inputs
+   - Sanitize data display
+   - Handle sensitive data properly
+   - Use HTTPS only
+
+## Feature Implementation
+1. Dashboard
+   - Portfolio overview
+   - Agent performance metrics
+   - Real-time trading signals
+   - Risk metrics visualization
+
+2. Agent Management
+   - Agent configuration interface
+   - Strategy visualization
+   - Performance analytics
+   - Decision history
+
+3. Portfolio Management
+   - Position overview
+   - Risk management interface
+   - Order management
+   - Performance tracking
+
+4. Analytics
+   - Trading performance metrics
+   - Agent decision analysis
+   - Risk analytics
+   - Market analysis
+
+5. Settings
+   - API configuration
+   - Agent parameters
+   - Risk parameters
+   - Notification settings
+
+## Development Workflow
+1. Feature Development
+   ```bash
+   git checkout -b feature/web/feature-name
+   cd web
+   pnpm dev
+   ```
+
+2. Testing
+   - Write unit tests
+   - Run integration tests
+   - Perform E2E testing
+   - Check accessibility
+
+3. Code Quality
+   - Run ESLint
+   - Check TypeScript types
+   - Format with Prettier
+   - Review bundle size
+
+4. Deployment
+   - Build optimization
+   - Environment validation
+   - Performance testing
+   - Security checks
+
+## Documentation
+- Document all components
+- Maintain API documentation
+- Update README.md
+- Keep changelog updated
+
+## Monitoring
+- Implement error tracking
+- Monitor performance metrics
+- Track user analytics
+- Log API usage
