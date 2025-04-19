@@ -6,7 +6,7 @@ alwaysApply: true
  # AI Hedge Fund Web Application Development Guidelines
 
 ## Technology Stack
-- Framework: Next.js 14 (App Router)
+- Framework: Next.js 15 (App Router)
 - Language: TypeScript
 - Styling: Tailwind CSS
 - Component Library: shadcn/ui
