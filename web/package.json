@@ -7,10 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "tailwind": "npx @tailwindcss/cli -i ./src/input.css -o ./src/output.css --watch"
+    "tailwind": "npx @tailwindcss/cli -i ./src/input.css -o ./src/output.css --watch",
+    "setup": "npm install @radix-ui/react-label @radix-ui/react-checkbox class-variance-authority clsx tailwind-merge lucide-react"
   },
   "dependencies": {
+    "@radix-ui/react-checkbox": "^1.2.2",
     "@radix-ui/react-dropdown-menu": "^2.1.10",
+    "@radix-ui/react-label": "^2.1.4",
     "@radix-ui/react-slot": "^1.2.0",
     "@tailwindcss/cli": "^4.1.4",
     "@tailwindcss/typography": "^0.5.16",

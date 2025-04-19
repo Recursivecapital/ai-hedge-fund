@@ -3,46 +3,48 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ModeToggle } from "@/components/mode-toggle";
+import { cn } from "@/lib/utils";
+
+const navigation = [
+  { name: "Home", href: "/" },
+  { name: "Dashboard", href: "/dashboard" },
+  { name: "AI Hedge Fund", href: "/hedge-fund" },
+  { name: "About", href: "/about" },
+];
 
 export function Header() {
   const pathname = usePathname();
-  
-  const navItems = [
-    { name: "Home", href: "/" },
-    { name: "Dashboard", href: "/dashboard" },
-    { name: "About", href: "/about" }
-  ];
-  
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
-        {/* Logo - left aligned */}
-        <div className="flex items-center flex-1">
-          <Link href="/" className="flex items-center space-x-2 font-bold">
-            <span>AI Hedge Fund</span>
+    <header className="bg-background border-b">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8" aria-label="Global">
+        <div className="flex lg:flex-1">
+          <Link href="/" className="flex items-center space-x-2">
+            <span className="text-lg font-semibold">AI Hedge Fund</span>
           </Link>
         </div>
-
-        {/* Navigation - centered */}
-        <nav className="hidden md:flex items-center justify-center flex-1 space-x-6 text-sm font-medium">
-          {navItems.map((item) => (
+        
+        <div className="hidden lg:flex lg:gap-x-8">
+          {navigation.map((item) => (
             <Link
-              key={item.href}
+              key={item.name}
               href={item.href}
-              className={`transition-colors hover:text-foreground/80 ${
-                pathname === item.href ? "text-foreground" : "text-foreground/60"
-              }`}
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary",
+                pathname === item.href
+                  ? "text-foreground"
+                  : "text-muted-foreground"
+              )}
             >
               {item.name}
             </Link>
           ))}
-        </nav>
-
-        {/* Theme toggle - right aligned */}
-        <div className="flex items-center justify-end flex-1">
+        </div>
+        
+        <div className="flex flex-1 items-center justify-end">
           <ModeToggle />
         </div>
-      </div>
+      </nav>
     </header>
   );
 } 

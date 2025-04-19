@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function Home() {
   return (
     <AppLayout>
-      <div className="max-w-5xl mx-auto space-y-12">
+      <div className="max-w-5xl mx-auto space-y-12 py-8">
         <section className="space-y-6">
           <div className="space-y-4">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
@@ -18,10 +18,10 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap gap-4">
             <Button asChild size="lg">
-              <Link href="/dashboard">View Dashboard</Link>
+              <Link href="/hedge-fund">Try AI Analysis</Link>
             </Button>
-            <Button variant="outline" size="lg">
-              Learn More
+            <Button variant="outline" size="lg" asChild>
+              <Link href="/dashboard">View Dashboard</Link>
             </Button>
           </div>
         </section>
@@ -31,16 +31,18 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Market Analysis</CardTitle>
+                <CardTitle>AI Investment Analysis</CardTitle>
                 <CardDescription>
-                  Real-time data processing and market trend analysis
+                  Legendary investors as AI agents
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Our AI algorithms analyze market trends and patterns to identify potential investment opportunities.</p>
+                <p>Get stock analysis from AI agents modeled after Warren Buffett, Peter Lynch, Ben Graham, and other legendary investors.</p>
               </CardContent>
               <CardFooter>
-                <Button variant="secondary" size="sm">Learn more</Button>
+                <Button variant="secondary" size="sm" asChild>
+                  <Link href="/hedge-fund">Try it now</Link>
+                </Button>
               </CardFooter>
             </Card>
             
@@ -73,6 +75,18 @@ export default function Home() {
                 <Button variant="secondary" size="sm">Learn more</Button>
               </CardFooter>
             </Card>
+          </div>
+        </section>
+        
+        <section className="bg-muted p-8 rounded-lg">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-2xl font-bold mb-4">AI-Powered Investment Insights</h2>
+            <p className="mb-6 text-muted-foreground">
+              Our platform combines the investment philosophies of legendary investors with cutting-edge AI technology to provide unique insights into the stock market.
+            </p>
+            <Button asChild>
+              <Link href="/hedge-fund">Get Started</Link>
+            </Button>
           </div>
         </section>
       </div>
