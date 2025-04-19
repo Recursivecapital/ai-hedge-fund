@@ -1,1 +1,238 @@
- 
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# AI Hedge Fund API Integration Guidelines
+
+## Architecture Overview
+```
+ai-hedge-fund/
+├── src/           # Original Python code (DO NOT MODIFY)
+├── api/           # FastAPI service
+│   ├── main.py    # API entry point
+│   ├── routers/   # API route modules
+│   ├── models/    # Pydantic data models
+│   ├── services/  # Business logic layer
+│   ├── utils/     # Utility functions
+│   └── tests/     # API tests
+├── web/           # Next.js frontend
+```
+
+## Core Principles
+
+1. **Zero Modification**
+   - NEVER modify files in the `/src` directory
+   - Import from `/src` as a library
+   - Use adapter pattern to interface with existing code
+
+2. **Clean API Design**
+   - RESTful principles for resource operations
+   - GraphQL for complex data requirements
+   - WebSockets for real-time updates
+
+3. **Type Safety End-to-End**
+   - Pydantic models in FastAPI
+   - Generated TypeScript types from OpenAPI schema
+   - tRPC for type-safe API calls
+
+## API Structure Guidelines
+
+### 1. Endpoint Design
+- Use resource-based naming: `/api/agents`, `/api/portfolio`, etc.
+- Implement proper HTTP methods (GET, POST, PUT, DELETE)
+- Version all endpoints: `/api/v1/agents`
+- Maintain backward compatibility
+
+### 2. Request/Response Format
+- Consistent JSON structure
+- Standardized error responses
+- Pagination for large collections
+- Proper HTTP status codes
+
+### 3. Data Validation
+- All inputs validated with Pydantic
+- Strong typing throughout codebase
+- Input sanitization
+- Validation error messages
+
+## Integration Rules
+
+### 1. Python Integration
+```python
+# CORRECT - Import without modification
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from src.agents.warren_buffett import WarrenBuffettAgent
+
+# CORRECT - Adapter pattern
+class AgentService:
+    def run_analysis(self, ticker: str, agent_name: str):
+        agent = self._get_agent(agent_name)
+        return agent.analyze(ticker)
+        
+    def _get_agent(self, agent_name: str):
+        # Factory pattern to instantiate agents
+        if agent_name == "warren_buffett":
+            return WarrenBuffettAgent()
+        # ...
+```
+
+### 2. Next.js Integration
+```typescript
+// CORRECT - Type-safe API client
+import { api } from '@/lib/api'
+
+// In your component
+export function AgentAnalysis() {
+  const { data, error, isLoading } = api.agents.analyze.useQuery({
+    ticker: 'AAPL',
+    agent: 'warren_buffett'
+  })
+  
+  // Handle loading/error states
+  if (isLoading) return <Loading />
+  if (error) return <ErrorDisplay error={error} />
+  
+  return <AnalysisResults data={data} />
+}
+```
+
+## Security Guidelines
+
+### 1. Authentication
+- JWT-based authentication
+- Secure token storage
+- Token refresh mechanism
+- Role-based access control
+
+### 2. CORS Configuration
+```python
+# api/main.py
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",  # Dev
+        "https://yourdomain.com",  # Prod
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+### 3. API Rate Limiting
+- Implement rate limiting
+- Use Redis for distributed rate limiting
+- Clear error messages for rate limited requests
+
+### 4. Input Validation
+- Validate all inputs from frontend
+- Prevent injection attacks
+- Sanitize data for display
+
+## Performance Rules
+
+### 1. Caching Strategy
+- Redis for server-side caching
+- TanStack Query for client-side caching
+- Proper cache invalidation
+- ETags for HTTP caching
+
+### 2. Query Optimization
+- Limit returned fields
+- Pagination for large datasets
+- Optimize database queries
+- Proper indexing
+
+### 3. Background Tasks
+- Use FastAPI background tasks for long operations
+- Implement job queue for intensive operations
+- Provide job status endpoints
+
+## Real-time Communication
+
+### 1. WebSocket Implementation
+```python
+# api/main.py
+@app.websocket("/ws/portfolio")
+async def portfolio_websocket(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        while True:
+            # Get real-time portfolio updates
+            data = get_portfolio_updates()
+            await websocket.send_json(data)
+            await asyncio.sleep(1)
+    except WebSocketDisconnect:
+        # Handle disconnection
+```
+
+### 2. Server-Sent Events
+- Alternative to WebSockets for one-way communication
+- Simpler implementation with automatic reconnection
+- Better HTTP compatibility
+
+## Error Handling
+
+### 1. API Error Format
+```json
+{
+  "status": "error",
+  "code": "VALIDATION_ERROR",
+  "message": "Invalid input parameters",
+  "details": [
+    {"field": "ticker", "error": "Invalid ticker symbol"}
+  ]
+}
+```
+
+### 2. Error Logging
+- Structured logging
+- Error tracking integration
+- Unique error reference IDs
+- Development vs. production error details
+
+## Testing Guidelines
+
+### 1. API Tests
+- Unit tests for all endpoints
+- Integration tests for API flows
+- Load tests for performance
+- Security tests for vulnerabilities
+
+### 2. Frontend Integration Tests
+- API mocking in frontend tests
+- End-to-end tests for critical paths
+- Contract tests to verify API consistency
+
+## Deployment Configuration
+
+### 1. Environment Setup
+```
+api/.env
+WEB_ORIGIN=https://yourdomain.com
+JWT_SECRET=your-secret-key
+DATABASE_URL=postgresql://user:password@localhost/db
+REDIS_URL=redis://localhost:6379
+```
+
+### 2. Docker Configuration
+- Separate containers for API and frontend
+- Docker Compose for development
+- Kubernetes for production
+- Health check endpoints
+
+## Documentation
+
+### 1. API Documentation
+- OpenAPI/Swagger for automated docs
+- Additional markdown docs for complex flows
+- Examples for all endpoints
+- Authentication documentation
+
+### 2. Integration Examples
+- Sample code for common operations
+- Environment setup instructions
+- Troubleshooting guide
