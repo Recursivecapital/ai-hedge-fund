@@ -1,154 +1,111 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { AppLayout } from "@/components/layout/app-layout";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function DashboardPage() {
+export default function Dashboard() {
+  // Mock data for the dashboard
+  const portfolioStats = [
+    { name: "Total Assets", value: "$1,245,600", change: "+8.2%" },
+    { name: "Today's Change", value: "$12,500", change: "+2.3%" },
+    { name: "Monthly Return", value: "$45,200", change: "+5.7%" },
+    { name: "Annual Return", value: "$142,300", change: "+11.4%" },
+  ];
+
+  const recentTrades = [
+    { id: 1, asset: "BTC/USD", type: "Buy", amount: "0.5 BTC", price: "$42,500", time: "10:32 AM", status: "Completed" },
+    { id: 2, asset: "ETH/USD", type: "Sell", amount: "3.2 ETH", price: "$3,100", time: "09:45 AM", status: "Completed" },
+    { id: 3, asset: "AAPL", type: "Buy", amount: "15 shares", price: "$178.25", time: "08:15 AM", status: "Completed" },
+    { id: 4, asset: "GOOGL", type: "Sell", amount: "5 shares", price: "$2,850.50", time: "Yesterday", status: "Completed" },
+  ];
+
   return (
-    <div className="flex flex-col gap-6">
-      <div className="border-b pb-4">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">Overview of your portfolio and performance</p>
-      </div>
+    <AppLayout>
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-muted-foreground mt-2">
+            Welcome to your AI trading dashboard. Here&apos;s an overview of your portfolio.
+          </p>
+        </div>
 
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="bg-card border">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="signals">Signals</TabsTrigger>
-          <TabsTrigger value="risk">Risk</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
-            <Card className="metric-card">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
-                <CardTitle className="metric-title">Total Portfolio Value</CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 pt-0">
-                <div className="metric-value text-primary">$12,549,301.38</div>
-                <p className="metric-change">
-                  <span className="profit-text">+2.5%</span> from last month
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="metric-card">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
-                <CardTitle className="metric-title">Daily P&L</CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 pt-0">
-                <div className="metric-value profit-text">+$45,231.89</div>
-                <p className="metric-change">
-                  <span className="profit-text">+0.36%</span> today
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="metric-card">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
-                <CardTitle className="metric-title">Active Positions</CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 pt-0">
-                <div className="metric-value">28</div>
-                <p className="metric-change">Across 12 sectors</p>
-              </CardContent>
-            </Card>
-            <Card className="metric-card">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
-                <CardTitle className="metric-title">New Signals</CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 pt-0">
-                <div className="metric-value">7</div>
-                <p className="metric-change">
-                  <span className="profit-text">5 buy</span>, <span className="loss-text">2 sell</span> recommendations
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2 mt-6">
-            <Card className="col-span-1 finance-card">
-              <CardHeader>
-                <CardTitle>Asset Allocation</CardTitle>
-                <CardDescription>Current portfolio allocation by asset class</CardDescription>
+        {/* Portfolio Stats */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {portfolioStats.map((stat, i) => (
+            <Card key={i}>
+              <CardHeader className="pb-2">
+                <CardDescription>{stat.name}</CardDescription>
+                <CardTitle className="text-2xl">{stat.value}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-80 flex items-center justify-center border rounded-md bg-muted/20">
-                  <p className="text-muted-foreground">Asset Allocation Chart</p>
-                </div>
+                <p className={`text-sm ${stat.change.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>
+                  {stat.change} from last period
+                </p>
               </CardContent>
             </Card>
+          ))}
+        </div>
 
-            <Card className="col-span-1 finance-card">
-              <CardHeader>
-                <CardTitle>Recent Agent Activity</CardTitle>
-                <CardDescription>Latest agent decisions and recommendations</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {Array.from({length: 5}).map((_, i) => (
-                    <div key={i} className="flex items-center gap-4 p-3 border rounded-md hover:bg-accent/30 transition-colors">
-                      <div className={`${i % 2 === 0 ? "bg-profit/10 text-profit" : "bg-loss/10 text-loss"} p-2 rounded-sm font-mono font-bold`}>
-                        {i % 2 === 0 ? "BUY" : "SELL"}
-                      </div>
-                      <div>
-                        <p className="font-medium">Agent {i + 1}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {i % 2 === 0 ? "Recommended to buy AAPL" : "Recommended to sell TSLA"}
-                        </p>
-                      </div>
-                    </div>
+        {/* Recent Trades */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Trades</CardTitle>
+            <CardDescription>Your most recent algorithmic trading activities</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-2 font-medium">Asset</th>
+                    <th className="text-left p-2 font-medium">Type</th>
+                    <th className="text-left p-2 font-medium">Amount</th>
+                    <th className="text-left p-2 font-medium">Price</th>
+                    <th className="text-left p-2 font-medium">Time</th>
+                    <th className="text-left p-2 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentTrades.map((trade) => (
+                    <tr key={trade.id} className="border-b">
+                      <td className="p-2">{trade.asset}</td>
+                      <td className={`p-2 ${trade.type === 'Buy' ? 'text-green-500' : 'text-red-500'}`}>{trade.type}</td>
+                      <td className="p-2">{trade.amount}</td>
+                      <td className="p-2">{trade.price}</td>
+                      <td className="p-2 text-muted-foreground">{trade.time}</td>
+                      <td className="p-2">
+                        <span className="px-2 py-1 rounded-full bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs">
+                          {trade.status}
+                        </span>
+                      </td>
+                    </tr>
                   ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
 
-        <TabsContent value="performance">
-          <div className="mt-4 space-y-4">
-            <Card className="finance-card">
-              <CardHeader>
-                <CardTitle>Performance Metrics</CardTitle>
-                <CardDescription>Historical and current performance data</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-80 flex items-center justify-center border rounded-md bg-muted/20">
-                  <p className="text-muted-foreground">Performance Chart</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="signals">
-          <div className="mt-4 space-y-4">
-            <Card className="finance-card">
-              <CardHeader>
-                <CardTitle>Trading Signals</CardTitle>
-                <CardDescription>Real-time trading signals from agents</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-80 flex items-center justify-center border rounded-md bg-muted/20">
-                  <p className="text-muted-foreground">Trading Signals List</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="risk">
-          <div className="mt-4 space-y-4">
-            <Card className="finance-card">
-              <CardHeader>
-                <CardTitle>Risk Metrics</CardTitle>
-                <CardDescription>Portfolio risk analysis and metrics</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-80 flex items-center justify-center border rounded-md bg-muted/20">
-                  <p className="text-muted-foreground">Risk Metrics Visualization</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
-  )
+        {/* Market Analysis */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Market Analysis</CardTitle>
+              <CardDescription>AI-powered market insights</CardDescription>
+            </CardHeader>
+            <CardContent className="h-72 flex items-center justify-center bg-muted/20">
+              <p className="text-muted-foreground">Chart visualization will appear here</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Predictions</CardTitle>
+              <CardDescription>Future market trend predictions</CardDescription>
+            </CardHeader>
+            <CardContent className="h-72 flex items-center justify-center bg-muted/20">
+              <p className="text-muted-foreground">Prediction data will appear here</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </AppLayout>
+  );
 } 

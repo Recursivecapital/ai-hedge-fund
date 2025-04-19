@@ -15,7 +15,10 @@
   },
   "author": "",
   "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
   "dependencies": {
-    "concurrently": "^8.2.2"
+    "@tailwindcss/typography": "^0.5.16"
   }
-} 
+}
