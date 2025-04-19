@@ -26,18 +26,18 @@
 ## Phase 2: Next.js Setup (Week 3)
 
 ### 2.1 Project Initialization
-- [ ] Initialize Next.js 15 project with App Router
-- [ ] Install and configure Tailwind CSS
-- [ ] Set up shadcn/ui components
-- [ ] Configure TypeScript strictness
-- [ ] Set up project directory structure
+- [x] Initialize Next.js 15 project with App Router
+- [x] Install and configure Tailwind CSS
+- [x] Set up shadcn/ui components
+- [x] Configure TypeScript strictness
+- [x] Set up project directory structure
 
 ### 2.2 Core UI Development
-- [ ] Create responsive layout with navigation
-- [ ] Implement dark/light mode
-- [ ] Set up form components with React Hook Form + Zod
-- [ ] Create loading/error UI states
-- [ ] Set up base API client with TanStack Query
+- [x] Create responsive layout with navigation
+- [x] Implement dark/light mode
+- [x] Set up form components with React Hook Form + Zod
+- [x] Create loading/error UI states
+- [x] Set up base API client with TanStack Query
 
 ## Phase 3: Feature Implementation (Weeks 4-6)
 

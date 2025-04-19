@@ -1,0 +1,253 @@
+@import "tailwindcss/preflight";
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+    /* Professional dark blue palette - Wall Street style */
+    --background: #f8f9fa;
+    --foreground: #1c2434;
+    --card: #ffffff;
+    --card-foreground: #1c2434;
+    --popover: #ffffff;
+    --popover-foreground: #1c2434;
+    --primary: #002e5d;
+    --primary-foreground: #ffffff;
+    --secondary: #f1f5f9;
+    --secondary-foreground: #1c2434;
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+    --accent: #e1e9f2;
+    --accent-foreground: #002e5d;
+    --destructive: #dc2626;
+    --destructive-foreground: #ffffff;
+    --border: #e2e8f0;
+    --input: #e2e8f0;
+    --ring: #002e5d;
+    
+    /* Financial accent colors */
+    --profit: #106a37;
+    --loss: #b91c1c;
+    --neutral: #475569;
+    --gold: #b7791f;
+    
+    --radius-sm: calc(var(--radius) - 2px);
+    --radius-md: var(--radius);
+    --radius-lg: calc(var(--radius) + 2px);
+    --radius-xl: calc(var(--radius) + 4px);
+  }
+  
+  .dark {
+    --background: #0a1120;
+    --foreground: #f8fafc;
+    --card: #141f31;
+    --card-foreground: #f8fafc;
+    --popover: #141f31;
+    --popover-foreground: #f8fafc;
+    --primary: #0050a0;
+    --primary-foreground: #ffffff;
+    --secondary: #1c293f;
+    --secondary-foreground: #f8fafc;
+    --muted: #1c293f;
+    --muted-foreground: #94a3b8;
+    --accent: #1d3a60;
+    --accent-foreground: #f8fafc;
+    --destructive: #b91c1c;
+    --destructive-foreground: #ffffff;
+    --border: #2d3c52;
+    --input: #2d3c52;
+    --ring: #0050a0;
+    
+    /* Financial accent colors - dark mode */
+    --profit: #15803d;
+    --loss: #b91c1c;
+    --neutral: #94a3b8;
+    --gold: #d97706;
+  }
+
+  * {
+    border-color: var(--border);
+    outline-color: color-mix(in oklab, var(--ring), transparent 50%);
+  }
+  
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "kern";
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    letter-spacing: -0.01em;
+  }
+
+  /* Financial styling utilities */
+  .profit-text {
+    color: var(--profit);
+    font-weight: 500;
+  }
+  
+  .loss-text {
+    color: var(--loss);
+    font-weight: 500;
+  }
+  
+  .gold-text {
+    color: var(--gold);
+    font-weight: 500;
+  }
+  
+  /* Card styling */
+  .finance-card {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .finance-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    border-color: color-mix(in oklab, var(--border), var(--ring) 15%);
+  }
+  
+  /* Dashboard value display */
+  .value-display {
+    font-family: 'SF Mono', 'Consolas', 'Liberation Mono', monospace;
+    font-weight: 500;
+    background-color: var(--muted);
+    border-radius: var(--radius-sm);
+    padding: 0.25rem 0.5rem;
+    display: inline-block;
+  }
+  
+  /* Navigation styling */
+  .nav-link {
+    position: relative;
+    transition: color 0.2s ease;
+    font-weight: 500;
+    padding: 0.5rem 0;
+  }
+  
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--primary);
+    transition: width 0.2s ease;
+  }
+  
+  .nav-link:hover::after {
+    width: 100%;
+  }
+  
+  .nav-link.active::after {
+    width: 100%;
+  }
+  
+  /* Button styles */
+  .finance-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    padding: 0.5rem 1rem;
+    letter-spacing: -0.01em;
+  }
+  
+  .finance-button-primary {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  .finance-button-primary:hover {
+    background-color: color-mix(in oklab, var(--primary), #000 10%);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  }
+  
+  .finance-button-secondary {
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+  
+  .finance-button-secondary:hover {
+    background-color: color-mix(in oklab, var(--secondary), #000 5%);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Table styling */
+  .finance-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  
+  .finance-table thead {
+    background-color: color-mix(in oklab, var(--background), var(--muted) 15%);
+  }
+  
+  .finance-table th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--foreground);
+    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .finance-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
+  }
+  
+  .finance-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .finance-table tr:hover {
+    background-color: color-mix(in oklab, var(--background), var(--muted) 5%);
+  }
+  
+  /* Financial dashboard specific styles */
+  .metric-card {
+    padding: 1.25rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background-color: var(--card);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .metric-title {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+    font-weight: 500;
+  }
+  
+  .metric-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-family: 'SF Mono', 'Consolas', 'Liberation Mono', monospace;
+  }
+  
+  .metric-change {
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+}

@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Routers for agents, analysis, portfolio, and backtest endpoints
   - Services that interface with existing Python code without modification
   - Utility functions for data transformation
+- Next.js frontend implementation (Phase 2)
+  - Next.js 15 project with App Router
+  - Responsive layout with navigation
+  - Dark/light mode support
+  - Form components with React Hook Form + Zod
+  - Loading and error UI states
+  - Type-safe API client with TanStack Query
 
 ### Changed
 - Updated web development guidelines with Todo List Management section
