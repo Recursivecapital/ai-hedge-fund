@@ -1,5 +1,9 @@
+'use client';
+
 import { AppLayout } from "@/components/layout/app-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { MarketOverview } from "@/components/market/market-overview";
+import { TrendingStocks } from '@/components/market/TrendingStocks';
 
 export default function Dashboard() {
   // Mock data for the dashboard
@@ -22,7 +26,7 @@ export default function Dashboard() {
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="mt-2 text-muted-foreground">
             Welcome to your AI trading dashboard. Here&apos;s an overview of your portfolio.
           </p>
         </div>
@@ -55,12 +59,12 @@ export default function Dashboard() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left p-2 font-medium">Asset</th>
-                    <th className="text-left p-2 font-medium">Type</th>
-                    <th className="text-left p-2 font-medium">Amount</th>
-                    <th className="text-left p-2 font-medium">Price</th>
-                    <th className="text-left p-2 font-medium">Time</th>
-                    <th className="text-left p-2 font-medium">Status</th>
+                    <th className="p-2 font-medium text-left">Asset</th>
+                    <th className="p-2 font-medium text-left">Type</th>
+                    <th className="p-2 font-medium text-left">Amount</th>
+                    <th className="p-2 font-medium text-left">Price</th>
+                    <th className="p-2 font-medium text-left">Time</th>
+                    <th className="p-2 font-medium text-left">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -72,7 +76,7 @@ export default function Dashboard() {
                       <td className="p-2">{trade.price}</td>
                       <td className="p-2 text-muted-foreground">{trade.time}</td>
                       <td className="p-2">
-                        <span className="px-2 py-1 rounded-full bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs">
+                        <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full dark:bg-green-900 dark:text-green-300">
                           {trade.status}
                         </span>
                       </td>
@@ -85,13 +89,13 @@ export default function Dashboard() {
         </Card>
 
         {/* Market Analysis */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <Card>
             <CardHeader>
               <CardTitle>Market Analysis</CardTitle>
               <CardDescription>AI-powered market insights</CardDescription>
             </CardHeader>
-            <CardContent className="h-72 flex items-center justify-center bg-muted/20">
+            <CardContent className="flex items-center justify-center h-72 bg-muted/20">
               <p className="text-muted-foreground">Chart visualization will appear here</p>
             </CardContent>
           </Card>
@@ -100,11 +104,14 @@ export default function Dashboard() {
               <CardTitle>Predictions</CardTitle>
               <CardDescription>Future market trend predictions</CardDescription>
             </CardHeader>
-            <CardContent className="h-72 flex items-center justify-center bg-muted/20">
+            <CardContent className="flex items-center justify-center h-72 bg-muted/20">
               <p className="text-muted-foreground">Prediction data will appear here</p>
             </CardContent>
           </Card>
         </div>
+
+        <MarketOverview />
+        <TrendingStocks />
       </div>
     </AppLayout>
   );

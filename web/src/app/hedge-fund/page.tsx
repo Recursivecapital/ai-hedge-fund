@@ -182,7 +182,7 @@ export default function HedgeFundPage() {
           </Button>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           <div className="lg:col-span-9">
             <Tabs defaultValue="results" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
@@ -190,18 +190,18 @@ export default function HedgeFundPage() {
                 <TabsTrigger value="portfolio">Portfolio Impact</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="results" className="space-y-4 py-4">
+              <TabsContent value="results" className="py-4 space-y-4">
                 {results.length > 0 ? (
                   <div className="space-y-6">
-                    <div className="overflow-x-auto rounded-md border">
+                    <div className="overflow-x-auto border rounded-md">
                       <table className="w-full border-collapse">
                         <thead>
                           <tr className="border-b bg-muted/50">
-                            <th className="p-3 text-left font-medium">Ticker</th>
-                            <th className="p-3 text-left font-medium">Action</th>
-                            <th className="p-3 text-right font-medium">Quantity</th>
-                            <th className="p-3 text-right font-medium">Confidence</th>
-                            <th className="p-3 text-right font-medium">Expected Return</th>
+                            <th className="p-3 font-medium text-left">Ticker</th>
+                            <th className="p-3 font-medium text-left">Action</th>
+                            <th className="p-3 font-medium text-right">Quantity</th>
+                            <th className="p-3 font-medium text-right">Confidence</th>
+                            <th className="p-3 font-medium text-right">Expected Return</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -222,7 +222,7 @@ export default function HedgeFundPage() {
                               <td className="p-3 text-right">{result.quantity}</td>
                               <td className="p-3 text-right">
                                 <div className="flex items-center justify-end">
-                                  <div className="w-16 bg-muted h-2 rounded-full mr-2">
+                                  <div className="w-16 h-2 mr-2 rounded-full bg-muted">
                                     <div 
                                       className={`h-2 rounded-full ${
                                         result.confidence > 75 
@@ -246,11 +246,11 @@ export default function HedgeFundPage() {
                       </table>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       {results.map((result, index) => (
                         <Card key={index}>
                           <CardHeader className="pb-2">
-                            <div className="flex justify-between items-center">
+                            <div className="flex items-center justify-between">
                               <div>
                                 <CardTitle className="text-lg">{result.ticker}</CardTitle>
                                 <CardDescription>
@@ -274,9 +274,9 @@ export default function HedgeFundPage() {
                                 <span className="text-muted-foreground">Confidence:</span>
                                 <span className="font-medium">{result.confidence.toFixed(1)}%</span>
                               </div>
-                              <div className="text-sm mt-4">
-                                <h4 className="font-medium mb-1">Analysis Reasoning:</h4>
-                                <div className="text-muted-foreground text-xs whitespace-pre-line">
+                              <div className="mt-4 text-sm">
+                                <h4 className="mb-1 font-medium">Analysis Reasoning:</h4>
+                                <div className="text-xs whitespace-pre-line text-muted-foreground">
                                   {result.reasoning}
                                 </div>
                               </div>
@@ -296,7 +296,7 @@ export default function HedgeFundPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="flex items-center justify-center py-8">
-                        <TrendingUp className="h-12 w-12 text-muted-foreground opacity-20" />
+                        <TrendingUp className="w-12 h-12 text-muted-foreground opacity-20" />
                       </div>
                     </CardContent>
                   </Card>
@@ -311,7 +311,7 @@ export default function HedgeFundPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center justify-center py-8">
-                      <p className="text-muted-foreground text-center">
+                      <p className="text-center text-muted-foreground">
                         Portfolio impact analysis will appear here after running analysis
                       </p>
                     </div>
@@ -321,7 +321,7 @@ export default function HedgeFundPage() {
             </Tabs>
           </div>
           
-          <div className="lg:col-span-3 space-y-6">
+          <div className="space-y-6 lg:col-span-3">
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base">Stock Selection</CardTitle>
@@ -335,13 +335,13 @@ export default function HedgeFundPage() {
                         <Badge key={ticker} variant="secondary" className="flex items-center gap-1">
                           {ticker}
                           <X 
-                            className="h-3 w-3 cursor-pointer" 
+                            className="w-3 h-3 cursor-pointer" 
                             onClick={() => handleTickerRemove(ticker)}
                           />
                         </Badge>
                       ))
                     ) : (
-                      <div className="text-xs text-muted-foreground py-1">
+                      <div className="py-1 text-xs text-muted-foreground">
                         No tickers selected
                       </div>
                     )}
@@ -383,11 +383,11 @@ export default function HedgeFundPage() {
                 <div className="pt-2">
                   <Button 
                     variant="outline" 
-                    className="w-full justify-between"
+                    className="justify-between w-full"
                     onClick={() => setIsSearchOpen(true)}
                   >
                     <span>Add Ticker</span>
-                    <Search className="h-4 w-4" />
+                    <Search className="w-4 h-4" />
                   </Button>
                 </div>
               </CardContent>
@@ -400,7 +400,7 @@ export default function HedgeFundPage() {
               <CardContent className="pt-0">
                 <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
                   {analysts.map((analyst) => (
-                    <div key={analyst.id} className="flex items-start space-x-2 py-1">
+                    <div key={analyst.id} className="flex items-start py-1 space-x-2">
                       <Checkbox
                         id={analyst.id}
                         checked={selectedAnalysts.includes(analyst.id)}
@@ -442,7 +442,7 @@ export default function HedgeFundPage() {
               >
                 <div>
                   <span className="font-medium">{stock.symbol}</span>
-                  <span className="text-muted-foreground ml-2">{stock.name}</span>
+                  <span className="ml-2 text-muted-foreground">{stock.name}</span>
                 </div>
                 <div className="flex gap-2">
                   <Badge variant="outline" className="text-xs">

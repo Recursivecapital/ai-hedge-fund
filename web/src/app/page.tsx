@@ -1,6 +1,7 @@
 import { AppLayout } from "@/components/layout/app-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { MarketOverview } from "@/components/market/market-overview";
 import Link from "next/link";
 
 export default function Home() {
@@ -24,6 +25,11 @@ export default function Home() {
               <Link href="/dashboard">View Dashboard</Link>
             </Button>
           </div>
+        </section>
+        
+        <section className="space-y-6">
+          <h2 className="text-3xl font-semibold tracking-tight">Market Overview</h2>
+          <MarketOverview />
         </section>
         
         <section className="space-y-6">
