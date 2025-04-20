@@ -1,7 +1,7 @@
 import { AppLayout } from "@/components/layout/app-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { MarketOverview } from "@/components/market/market-overview";
+import { MarketOverview } from "@/components/market/MarketOverview";
 import Link from "next/link";
 
 export default function Home() {

@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from 'react';
 import { RefreshCw, ExternalLink } from 'lucide-react';
 import { Sparklines, SparklinesLine } from 'react-sparklines';
@@ -117,9 +119,9 @@ export function MarketOverview() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="flex gap-4 pb-2 overflow-x-auto flex-nowrap">
         {indices.map((index) => (
-          <Card key={index.symbol} className="relative p-4 group">
+          <Card key={index.symbol} className="relative p-4 group min-w-[220px] w-1/4 flex-shrink-0">
             <div className="flex flex-col">
               <div className="flex items-start justify-between mb-1">
                 <div>
@@ -186,15 +188,17 @@ export function MarketOverview() {
 
           <Card className="p-4">
             <h3 className="mb-2 text-sm font-medium">Trading Volume</h3>
-            <div className="flex items-baseline gap-1">
+            <div className="flex items-center gap-2">
               <span className="text-2xl font-semibold tabular-nums">
                 {sentiment.volume}
               </span>
-              <span className="text-sm text-muted-foreground">shares</span>
+              <div className="flex flex-col">
+                <span className="text-sm text-muted-foreground">shares</span>
+                <span className="text-xs text-muted-foreground">
+                  Total market volume today
+                </span>
+              </div>
             </div>
-            <span className="block mt-1 text-sm text-muted-foreground">
-              Total market volume today
-            </span>
           </Card>
 
           <Card className="p-4">
