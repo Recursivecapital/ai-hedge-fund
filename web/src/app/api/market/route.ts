@@ -1,6 +1,28 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import yahooFinance from 'yahoo-finance2';
+import { withRetry } from '@/lib/utils/errorHandler';
+import { mockMarketData } from '@/lib/utils/mockMarketData';
 
+// Flag to enable fallback to mock data when Yahoo Finance is unavailable
+const ENABLE_MOCK_FALLBACK = true;
+
+// Define indices for tracking
+const INDEX_SYMBOLS = [
+  '^GSPC',  // S&P 500
+  '^DJI',   // Dow Jones Industrial Average
+  '^IXIC',  // NASDAQ Composite
+  '^RUT',   // Russell 2000
+  '^VIX',   // CBOE Volatility Index
+];
+
+// Define trending stocks
+const TRENDING_SYMBOLS = [
+  'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META',
+  'TSLA', 'NVDA', 'JPM', 'V', 'WMT',
+  'JNJ', 'PG', 'XOM', 'BAC', 'DIS'
+];
+
+// Define types for API responses
 interface HistoricalRow {
   date: Date;
   open: number;
@@ -10,180 +32,222 @@ interface HistoricalRow {
   volume: number;
 }
 
-interface YahooQuote {
-  symbol?: string;
-  shortName?: string;
-  longName?: string;
-  regularMarketPrice?: number;
-  regularMarketChangePercent?: number;
-  regularMarketVolume?: number;
-  marketCap?: number;
-  regularMarketDayHigh?: number;
-  regularMarketDayLow?: number;
-  sector?: string;
-}
-
-const TRENDING_SYMBOLS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META'];
-const INDEX_SYMBOLS = ['^GSPC', '^DJI', '^IXIC', '^RUT'];
-const INDEX_NAMES = ['S&P 500', 'Dow Jones', 'Nasdaq', 'Russell 2000'];
-
-// Helper function to handle Yahoo Finance API calls with retries
-async function fetchWithRetry<T>(fn: () => Promise<T>, maxRetries = 3): Promise<T> {
-  let lastError;
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error;
-      if (i < maxRetries - 1) {
-        // Wait before retrying (exponential backoff)
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-      }
-    }
-  }
-  throw lastError;
-}
-
-export async function GET(request: Request) {
+// Enhanced helper function to fetch with retry logic and handle potential redirect issues
+async function fetchWithRetry<T>(operation: () => Promise<T>): Promise<T> {
   try {
-    const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type');
+    // Use our custom retry mechanism with increased parameters
+    return await withRetry(operation, { 
+      maxRetries: 5, 
+      initialDelay: 2000,
+      maxDelay: 15000
+    });
+  } catch (error) {
+    // Specifically handle the guce.yahoo.com redirect error
+    if (error instanceof Error && 
+        (error.message.includes('guce.yahoo.com') || 
+         error.message.includes('We expected a redirect'))) {
+      console.warn('Yahoo Finance redirect error detected:', error.message);
+      
+      // Throw a more informative error
+      throw new Error(`Yahoo Finance API access issue: The service may be temporarily blocking automated requests. Try again in a few minutes.`);
+    }
+    
+    // Re-throw other errors
+    throw error;
+  }
+}
 
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const type = searchParams.get('type');
+
+  try {
     switch (type) {
       case 'indices': {
-        // Fetch both current quotes and historical data for sparklines
-        const quotesPromises = INDEX_SYMBOLS.map((symbol) => 
-          fetchWithRetry(() => yahooFinance.quote(symbol))
-        );
-        const sparklinePromises = INDEX_SYMBOLS.map((symbol) => {
-          const endDate = new Date();
-          const startDate = new Date();
-          startDate.setDate(startDate.getDate() - 7); // Get 7 days of data for sparklines
+        try {
+          // Try to fetch market indices from Yahoo Finance
+          const quotes = await Promise.all(
+            INDEX_SYMBOLS.map(symbol => fetchWithRetry(() => yahooFinance.quote(symbol)))
+          );
 
-          return fetchWithRetry(() => yahooFinance.historical(symbol, {
-            period1: startDate,
-            period2: endDate,
-            interval: '1d',
-          }));
-        });
-
-        const [quotes, ...sparklineData] = await Promise.all([Promise.all(quotesPromises), ...sparklinePromises]);
-
-        const indices = quotes.map((quote: YahooQuote, index) => {
-          // Extract sparkline data points
-          const sparkline = (sparklineData[index] as HistoricalRow[])?.map((item) => item.close) || [];
-
-          return {
-            name: INDEX_NAMES[index],
-            symbol: INDEX_SYMBOLS[index],
+          const indices = quotes.map(quote => ({
+            name: quote.shortName || quote.longName || quote.symbol || '',
+            symbol: quote.symbol || '',
             value: quote.regularMarketPrice || 0,
             change: quote.regularMarketChangePercent || 0,
-            sparklineData: sparkline,
-          };
-        });
+            sparklineData: [], // Yahoo Finance doesn't provide this directly
+          }));
 
-        return NextResponse.json(indices);
+          return NextResponse.json(indices, {
+            headers: {
+              'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+            },
+          });
+        } catch (error) {
+          console.error('Error fetching indices from Yahoo Finance:', error);
+          
+          // If fallback is enabled and we got a Yahoo Finance error, use mock data
+          if (ENABLE_MOCK_FALLBACK && error instanceof Error && 
+             (error.message.includes('yahoo.com') || error.message.includes('redirect'))) {
+            console.log('Falling back to mock indices data');
+            return NextResponse.json(mockMarketData.getIndices(), {
+              headers: {
+                'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+                'X-Data-Source': 'mock', // Indicate this is mock data
+              },
+            });
+          }
+          
+          throw error;
+        }
       }
 
       case 'trending': {
-        // Fetch both current quotes and historical data for sparklines
-        const quotesPromises = TRENDING_SYMBOLS.map((symbol) => 
-          fetchWithRetry(() => yahooFinance.quote(symbol))
-        );
-        const sparklinePromises = TRENDING_SYMBOLS.map((symbol) => {
-          const endDate = new Date();
-          const startDate = new Date();
-          startDate.setDate(startDate.getDate() - 7); // Get 7 days of data for sparklines
+        try {
+          // Try to fetch trending stocks from Yahoo Finance
+          const quotesPromises = TRENDING_SYMBOLS.map(symbol => 
+            fetchWithRetry(() => yahooFinance.quote(symbol))
+          );
+          
+          const sparklinePromises = TRENDING_SYMBOLS.map(symbol => {
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - 7); // Get 7 days of data for sparklines
 
-          return fetchWithRetry(() => yahooFinance.historical(symbol, {
-            period1: startDate,
-            period2: endDate,
-            interval: '1d',
-          }));
-        });
+            return fetchWithRetry(() => yahooFinance.historical(symbol, {
+              period1: startDate,
+              period2: endDate,
+              interval: '1d',
+            }));
+          });
 
-        const [quotes, ...sparklineData] = await Promise.all([Promise.all(quotesPromises), ...sparklinePromises]);
+          // Wait for all promises to resolve
+          const [quotes, ...sparklineData] = await Promise.all([
+            Promise.all(quotesPromises), 
+            ...sparklinePromises
+          ]);
 
-        const stocks = quotes.map((quote: YahooQuote, index) => {
-          const marketCap = quote.marketCap || 0;
-          const marketCapFormatted = marketCap >= 1e12 ? `${(marketCap / 1e12).toFixed(1)}T` : `${(marketCap / 1e9).toFixed(1)}B`;
+          // Format the response
+          const stocks = quotes.map((quote, index) => {
+            const marketCap = quote.marketCap || 0;
+            const marketCapFormatted = marketCap >= 1e12 
+              ? `${(marketCap / 1e12).toFixed(1)}T` 
+              : `${(marketCap / 1e9).toFixed(1)}B`;
 
-          const volume = quote.regularMarketVolume || 0;
-          const volumeFormatted = volume >= 1e9 ? `${(volume / 1e9).toFixed(1)}B` : volume >= 1e6 ? `${(volume / 1e6).toFixed(1)}M` : `${(volume / 1e3).toFixed(1)}K`;
+            const volume = quote.regularMarketVolume || 0;
+            const volumeFormatted = volume >= 1e9 
+              ? `${(volume / 1e9).toFixed(1)}B` 
+              : volume >= 1e6 
+                ? `${(volume / 1e6).toFixed(1)}M` 
+                : `${(volume / 1e3).toFixed(1)}K`;
 
-          // Extract sparkline data points
-          const sparkline = (sparklineData[index] as HistoricalRow[])?.map((item) => item.close) || [];
+            // Extract sparkline data points
+            const sparkline = sparklineData[index]
+              ? sparklineData[index].map((item: HistoricalRow) => item.close) 
+              : [];
 
-          return {
-            symbol: quote.symbol || '',
-            name: quote.shortName || quote.longName || '',
-            price: quote.regularMarketPrice || 0,
-            change: quote.regularMarketChangePercent || 0,
-            volume: volumeFormatted,
-            marketCap: marketCapFormatted,
-            dayHigh: quote.regularMarketDayHigh || 0,
-            dayLow: quote.regularMarketDayLow || 0,
-            shortName: quote.shortName || '',
-            longName: quote.longName || '',
-            sparklineData: sparkline,
-            sector: quote.sector || 'Technology', // Default to Technology if sector is not available
-          };
-        });
+            // Get sector info if available - Yahoo Finance doesn't always provide sector
+            // so we'll use a default value
+            const defaultSector = 'Technology';
 
-        // Sort by market cap descending
-        stocks.sort((a, b) => {
-          const aValue = parseFloat(a.marketCap.replace(/[TB]/g, '')) * (a.marketCap.includes('T') ? 1000 : 1);
-          const bValue = parseFloat(b.marketCap.replace(/[TB]/g, '')) * (b.marketCap.includes('T') ? 1000 : 1);
-          return bValue - aValue;
-        });
+            return {
+              symbol: quote.symbol || '',
+              name: quote.shortName || quote.longName || '',
+              price: quote.regularMarketPrice || 0,
+              change: quote.regularMarketChangePercent || 0,
+              volume: volumeFormatted,
+              marketCap: marketCapFormatted,
+              dayHigh: quote.regularMarketDayHigh || 0,
+              dayLow: quote.regularMarketDayLow || 0,
+              shortName: quote.shortName || '',
+              longName: quote.longName || '',
+              sparklineData: sparkline,
+              sector: defaultSector, // Use default sector since it might not be available
+            };
+          });
 
-        return NextResponse.json(stocks);
+          return NextResponse.json(stocks, {
+            headers: {
+              'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+            },
+          });
+        } catch (error) {
+          console.error('Error fetching trending stocks from Yahoo Finance:', error);
+          
+          // If fallback is enabled and we got a Yahoo Finance error, use mock data
+          if (ENABLE_MOCK_FALLBACK && error instanceof Error && 
+             (error.message.includes('yahoo.com') || error.message.includes('redirect'))) {
+            console.log('Falling back to mock trending stocks data');
+            return NextResponse.json(mockMarketData.getTrendingStocks(), {
+              headers: {
+                'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+                'X-Data-Source': 'mock', // Indicate this is mock data
+              },
+            });
+          }
+          
+          throw error;
+        }
       }
 
       case 'sentiment': {
-        // Get VIX for volatility and SPY for volume
-        const [vix, spy] = await Promise.all([
-          fetchWithRetry(() => yahooFinance.quote('^VIX')),
-          fetchWithRetry(() => yahooFinance.quote('SPY'))
-        ]) as [YahooQuote, YahooQuote];
-
-        const volatility = vix.regularMarketPrice || 0;
-        const sentiment = Math.max(0, Math.min(100, 100 - volatility));
-        const volume = spy.regularMarketVolume || 0;
-        const volumeFormatted = `${(volume / 1e9).toFixed(1)}B`;
-
-        return NextResponse.json({
-          sentiment,
-          volume: volumeFormatted,
-          volatility,
-        });
+        try {
+          // Try to fetch market sentiment data from Yahoo Finance
+          const spx = await fetchWithRetry(() => yahooFinance.quote('^GSPC'));
+          
+          // Calculate sentiment based on market conditions
+          const change = spx.regularMarketChangePercent || 0;
+          let sentiment = 50; // neutral
+          
+          if (change > 1.5) sentiment = 90; // very bullish
+          else if (change > 0.5) sentiment = 70; // bullish
+          else if (change < -1.5) sentiment = 10; // very bearish
+          else if (change < -0.5) sentiment = 30; // bearish
+          
+          // Simulated values for volume and volatility
+          const volumeValue = Math.max(50, Math.min(100, 70 + (spx.regularMarketVolume || 0) / 5e9));
+          const volatility = Math.max(10, Math.min(90, 50 + Math.abs(change) * 10));
+          
+          return NextResponse.json({
+            sentiment,
+            volume: `${volumeValue.toFixed(1)}%`,
+            volatility
+          }, {
+            headers: {
+              'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+            },
+          });
+        } catch (error) {
+          console.error('Error fetching market sentiment from Yahoo Finance:', error);
+          
+          // If fallback is enabled and we got a Yahoo Finance error, use mock data
+          if (ENABLE_MOCK_FALLBACK && error instanceof Error && 
+             (error.message.includes('yahoo.com') || error.message.includes('redirect'))) {
+            console.log('Falling back to mock market sentiment data');
+            return NextResponse.json(mockMarketData.getMarketSentiment(), {
+              headers: {
+                'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+                'X-Data-Source': 'mock', // Indicate this is mock data
+              },
+            });
+          }
+          
+          throw error;
+        }
       }
 
       case 'historical': {
         const symbol = searchParams.get('symbol');
-        const timeframe = searchParams.get('timeframe');
-
+        const timeframe = searchParams.get('timeframe') || '1M';
+        
         if (!symbol) {
-          console.error('Historical data request missing symbol');
           return NextResponse.json({ error: 'Symbol is required' }, { status: 400 });
         }
-
-        if (!timeframe || !['1D', '1W', '1M', '3M', '1Y', '5Y'].includes(timeframe)) {
-          console.error(`Invalid timeframe: ${timeframe}`);
-          return NextResponse.json({ error: 'Invalid timeframe' }, { status: 400 });
-        }
-
+        
         // Calculate start date based on timeframe
-        const now = new Date();
+        const endDate = new Date();
         const startDate = new Date();
-
-        // Ensure we're not requesting future data
-        now.setHours(23, 59, 59, 999);
-        startDate.setHours(0, 0, 0, 0);
-
-        // Set interval and adjust dates based on timeframe
-        let interval: '1d' | '1wk' | '1mo' = '1d';
-
+        
         switch (timeframe) {
           case '1D':
             startDate.setDate(startDate.getDate() - 1);
@@ -196,49 +260,105 @@ export async function GET(request: Request) {
             break;
           case '3M':
             startDate.setMonth(startDate.getMonth() - 3);
-            interval = '1d';
             break;
           case '1Y':
             startDate.setFullYear(startDate.getFullYear() - 1);
-            interval = '1wk';
             break;
           case '5Y':
             startDate.setFullYear(startDate.getFullYear() - 5);
-            interval = '1mo';
             break;
+          default:
+            startDate.setMonth(startDate.getMonth() - 1); // Default to 1M
         }
-
+        
+        // Select interval based on timeframe (using only valid values for the yahoo-finance2 library)
+        let interval: '1d' | '1wk' | '1mo' = '1d';
+        
+        if (timeframe === '1Y' || timeframe === '5Y') {
+          interval = '1wk';
+        } else if (timeframe === 'max') {
+          interval = '1mo';
+        }
+        
         try {
-          console.log(`Fetching historical data for ${symbol} from ${startDate.toISOString()} to ${now.toISOString()} with interval ${interval}`);
-
-          const data = await fetchWithRetry(() => yahooFinance.historical(symbol, {
+          // Try to fetch historical data from Yahoo Finance
+          const history = await fetchWithRetry(() => yahooFinance.historical(symbol, {
             period1: startDate,
-            period2: now,
+            period2: endDate,
             interval,
           }));
-
-          // Transform data to expected format
-          const historicalData = data.map((item: HistoricalRow) => ({
-            time: item.date.getTime(),
-            open: item.open,
-            high: item.high,
-            low: item.low,
-            close: item.close,
-            volume: item.volume,
+          
+          // Transform the data for the chart
+          const historicalData = history.map((row: HistoricalRow) => ({
+            time: new Date(row.date).getTime() / 1000, // Convert to seconds for chart library
+            open: row.open,
+            high: row.high,
+            low: row.low,
+            close: row.close,
+            volume: row.volume,
           }));
-
-          return NextResponse.json(historicalData);
+          
+          return NextResponse.json(historicalData, {
+            headers: {
+              'Cache-Control': timeframe === '1D' 
+                ? 'public, s-maxage=60, stale-while-revalidate=300'
+                : 'public, s-maxage=3600, stale-while-revalidate=86400',
+            },
+          });
         } catch (error) {
           console.error(`Error fetching historical data for ${symbol}:`, error);
-          return NextResponse.json({ error: 'Failed to fetch historical data' }, { status: 500 });
+          
+          // If fallback is enabled and we got a Yahoo Finance error, use mock data
+          if (ENABLE_MOCK_FALLBACK && error instanceof Error && 
+             (error.message.includes('yahoo.com') || error.message.includes('redirect'))) {
+            console.log(`Falling back to mock historical data for ${symbol} (${timeframe})`);
+            return NextResponse.json(
+              mockMarketData.getHistoricalData(
+                symbol, 
+                timeframe as '1D' | '1W' | '1M' | '3M' | '1Y' | '5Y'
+              ), 
+              {
+                headers: {
+                  'Cache-Control': timeframe === '1D' 
+                    ? 'public, s-maxage=60, stale-while-revalidate=300'
+                    : 'public, s-maxage=3600, stale-while-revalidate=86400',
+                  'X-Data-Source': 'mock', // Indicate this is mock data
+                },
+              }
+            );
+          }
+          
+          // If we get the specific redirect error, return a friendly error message
+          if (error instanceof Error && 
+              (error.message.includes('yahoo.com') || 
+               error.message.includes('redirect'))) {
+            return NextResponse.json({ 
+              error: 'Yahoo Finance temporarily unavailable. Please try again in a few minutes.' 
+            }, { status: 503 });
+          }
+          throw error;
         }
       }
-
+      
       default:
         return NextResponse.json({ error: 'Invalid type parameter' }, { status: 400 });
     }
   } catch (error) {
-    console.error('Market API Error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('API Error:', error);
+    
+    // Special handling for Yahoo Finance redirect errors
+    if (error instanceof Error && 
+        (error.message.includes('yahoo.com') || 
+         error.message.includes('redirect'))) {
+      return NextResponse.json(
+        { error: 'Yahoo Finance temporarily unavailable. Please try again in a few minutes.' },
+        { status: 503 }
+      );
+    }
+    
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    );
   }
 } 

@@ -55,3 +55,4 @@ web/.next/
 web/package-lock.json
 web/yarn.lock
 web/pnpm-lock.yaml
+web/.env.local
