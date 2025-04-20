@@ -7,13 +7,13 @@ import Link from "next/link";
 export default function Home() {
   return (
     <AppLayout>
-      <div className="max-w-5xl mx-auto space-y-12 py-8">
+      <div className="py-8 space-y-12">
         <section className="space-y-6">
           <div className="space-y-4">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
               Welcome to AI Hedge Fund
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl">
+            <p className="max-w-2xl text-xl text-muted-foreground">
               Advanced algorithmic trading powered by artificial intelligence.
             </p>
           </div>
@@ -28,13 +28,13 @@ export default function Home() {
         </section>
         
         <section className="space-y-6">
-          <h2 className="text-3xl font-semibold tracking-tight">Market Overview</h2>
+          {/* <h2 className="text-3xl font-semibold tracking-tight">Market Overview</h2> */}
           <MarketOverview />
         </section>
         
         <section className="space-y-6">
           <h2 className="text-3xl font-semibold tracking-tight">Our Services</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <Card>
               <CardHeader>
                 <CardTitle>AI Investment Analysis</CardTitle>
@@ -84,9 +84,9 @@ export default function Home() {
           </div>
         </section>
         
-        <section className="bg-muted p-8 rounded-lg">
+        <section className="p-8 rounded-lg bg-muted">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-2xl font-bold mb-4">AI-Powered Investment Insights</h2>
+            <h2 className="mb-4 text-2xl font-bold">AI-Powered Investment Insights</h2>
             <p className="mb-6 text-muted-foreground">
               Our platform combines the investment philosophies of legendary investors with cutting-edge AI technology to provide unique insights into the stock market.
             </p>

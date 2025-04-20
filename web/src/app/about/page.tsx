@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 export default function About() {
   return (
     <AppLayout>
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="space-y-8">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">About AI Hedge Fund</h1>
           <p className="text-muted-foreground">
@@ -50,28 +50,28 @@ export default function About() {
               <div className="flex flex-col space-y-1.5 p-4 rounded-lg bg-muted/50">
                 <h3 className="font-semibold">Dr. Alexandra Chen</h3>
                 <p className="text-sm text-muted-foreground">Founder & CEO</p>
-                <p className="text-sm mt-2">
+                <p className="mt-2 text-sm">
                   Former AI Research Lead at Quantum Capital with a Ph.D. in Machine Learning
                 </p>
               </div>
               <div className="flex flex-col space-y-1.5 p-4 rounded-lg bg-muted/50">
                 <h3 className="font-semibold">Michael Rodriguez</h3>
                 <p className="text-sm text-muted-foreground">Chief Technology Officer</p>
-                <p className="text-sm mt-2">
+                <p className="mt-2 text-sm">
                   15+ years experience building high-frequency trading systems
                 </p>
               </div>
               <div className="flex flex-col space-y-1.5 p-4 rounded-lg bg-muted/50">
                 <h3 className="font-semibold">Sarah Johnson</h3>
                 <p className="text-sm text-muted-foreground">Chief Investment Officer</p>
-                <p className="text-sm mt-2">
+                <p className="mt-2 text-sm">
                   Former portfolio manager with 20+ years of experience in global markets
                 </p>
               </div>
               <div className="flex flex-col space-y-1.5 p-4 rounded-lg bg-muted/50">
                 <h3 className="font-semibold">James Park</h3>
                 <p className="text-sm text-muted-foreground">Head of AI Research</p>
-                <p className="text-sm mt-2">
+                <p className="mt-2 text-sm">
                   Expert in neural networks and predictive modeling for financial applications
                 </p>
               </div>
