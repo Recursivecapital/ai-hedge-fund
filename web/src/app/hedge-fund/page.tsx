@@ -14,7 +14,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -422,7 +421,11 @@ export default function HedgeFundPage() {
         </div>
       </div>
       
-      <CommandDialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+      <CommandDialog 
+        open={isSearchOpen} 
+        onOpenChange={setIsSearchOpen} 
+        title="Stock Search"
+      >
         <CommandInput 
           placeholder="Search for stocks..." 
           value={searchValue}
