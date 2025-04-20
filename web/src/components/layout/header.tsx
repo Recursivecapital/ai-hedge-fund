@@ -17,7 +17,7 @@ export function Header() {
 
   return (
     <header className="bg-background border-b">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8" aria-label="Global">
+      <nav className="container mx-auto flex items-center justify-between p-4 md:px-6" aria-label="Global">
         <div className="flex lg:flex-1">
           <Link href="/" className="flex items-center space-x-2">
             <span className="text-lg font-semibold">AI Hedge Fund</span>
