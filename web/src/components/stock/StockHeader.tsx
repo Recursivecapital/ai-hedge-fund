@@ -110,7 +110,7 @@ export function StockHeader({ stockData, insights }: StockHeaderProps) {
         </div>
       </div>
 
-      <Card className='bg-card'>
+      <Card className='border rounded-lg'>
         <div className='p-6'>
           <div className='flex flex-col justify-between gap-6 mb-8 sm:flex-row sm:items-center'>
             <div className='flex items-center gap-3'>
@@ -140,21 +140,22 @@ export function StockHeader({ stockData, insights }: StockHeaderProps) {
           </div>
 
           <Tabs defaultValue='market_summary' className='w-full'>
-            <TabsList className='grid grid-cols-2 lg:grid-cols-3 h-auto gap-1.5 p-1.5 bg-muted/50 backdrop-blur-sm rounded-xl'>
+            <TabsList className='flex gap-2 p-2 overflow-x-auto border rounded-lg flex-nowrap bg-card/80 backdrop-blur-sm no-scrollbar border-border/30 justify-evenly'>
               {Object.entries(sectionConfig).map(([key, section]) => {
                 const Icon = section.icon;
                 return (
                   <TabsTrigger
                     key={key}
                     value={key}
-                    className='flex items-center gap-2.5 py-2.5 px-4 
-                             text-muted-foreground
-                             data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=active]:font-medium
+                    className='flex items-center gap-2 py-2 px-3 whitespace-nowrap
+                             text-muted-foreground flex-shrink-0
+                             data-[state=active]:!bg-slate-700 data-[state=active]:!text-white data-[state=active]:font-medium
+                             data-[state=active]:border-b-2 data-[state=active]:border-primary
                              hover:text-foreground/80 hover:bg-muted/70
-                             transition-all duration-200 rounded-lg'
+                             transition-all duration-200'
                   >
-                    <Icon className='w-4 h-4' />
-                    <span className='hidden text-sm font-medium sm:inline'>{section.title}</span>
+                    <Icon className='flex-shrink-0 w-4 h-4' />
+                    <span className='text-sm font-medium'>{section.title}</span>
                   </TabsTrigger>
                 );
               })}

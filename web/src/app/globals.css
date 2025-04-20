@@ -1,2 +1,14 @@
 /* Import the generated Tailwind CSS */
 @import "../output.css"; 
+
+/* Hide scrollbar but maintain functionality */
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+} 
