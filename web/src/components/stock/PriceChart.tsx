@@ -1,63 +1,19 @@
 'use client';
 
 import * as React from 'react';
-import { createChart, IChartApi, ColorType, UTCTimestamp } from 'lightweight-charts';
+import { 
+  createChart, 
+  ColorType, 
+  UTCTimestamp, 
+  IChartApi, 
+  ISeriesApi,
+  CandlestickSeries,
+  HistogramSeries,
+  CrosshairMode,
+  MouseEventParams
+} from 'lightweight-charts';
 import { cn } from '@/lib/utils';
 import { getHistoricalPrices } from '@/lib/market-service';
-
-// Define extended interface for IChartApi to account for newer methods
-interface ExtendedChartApi extends IChartApi {
-  addCandlestickSeries: (options?: CandlestickSeriesOptions) => CandlestickSeries;
-  addHistogramSeries: (options?: HistogramSeriesOptions) => HistogramSeries;
-}
-
-// Simplified options for candlestick series
-interface CandlestickSeriesOptions {
-  upColor?: string;
-  downColor?: string;
-  borderVisible?: boolean;
-  wickUpColor?: string;
-  wickDownColor?: string;
-  priceFormat?: {
-    type: string;
-    precision: number;
-    minMove: number;
-  };
-}
-
-// Simplified options for histogram series
-interface HistogramSeriesOptions {
-  priceFormat?: {
-    type: string;
-  };
-  priceScaleId?: string;
-  color?: string;
-  base?: number;
-}
-
-// Simplified series interfaces
-interface CandlestickSeries {
-  setData: (data: CandlestickData[]) => void;
-}
-
-interface HistogramSeries {
-  setData: (data: HistogramData[]) => void;
-}
-
-// Data types for each series
-interface CandlestickData {
-  time: UTCTimestamp;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-}
-
-interface HistogramData {
-  time: UTCTimestamp;
-  value: number;
-  color?: string;
-}
 
 interface PriceChartProps {
   data: {
@@ -80,14 +36,6 @@ interface ChartLegendData {
   volume: number;
 }
 
-interface SeriesData {
-  open?: number;
-  high?: number;
-  low?: number;
-  close?: number;
-  value?: number;
-}
-
 export function PriceChart({ data: initialData, className, symbol }: PriceChartProps) {
   const chartContainerRef = React.useRef<HTMLDivElement>(null);
   const [selectedTimeframe, setSelectedTimeframe] = React.useState<'1D' | '1W' | '1M' | '3M' | '1Y' | '5Y'>('1M');
@@ -95,9 +43,11 @@ export function PriceChart({ data: initialData, className, symbol }: PriceChartP
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [legendData, setLegendData] = React.useState<ChartLegendData | null>(null);
-  const chartInstance = React.useRef<ExtendedChartApi | null>(null);
-  const candlestickSeries = React.useRef<CandlestickSeries | null>(null);
-  const volumeSeries = React.useRef<HistogramSeries | null>(null);
+  
+  // Use proper types for chart references
+  const chartInstance = React.useRef<IChartApi | null>(null);
+  const candlestickSeries = React.useRef<ISeriesApi<'Candlestick'> | null>(null);
+  const volumeSeries = React.useRef<ISeriesApi<'Histogram'> | null>(null);
   const resizeObserver = React.useRef<ResizeObserver | null>(null);
   const isInitialMount = React.useRef(true);
 
@@ -126,70 +76,93 @@ export function PriceChart({ data: initialData, className, symbol }: PriceChartP
 
   // Initialize chart and handle updates
   React.useEffect(() => {
-    if (!chartContainerRef.current) return;
+    // Debug output
+    console.log('Chart initialization with data points:', data.length);
+    
+    if (!chartContainerRef.current) {
+      console.log('Chart container ref not ready yet');
+      return;
+    }
 
     const shouldCreateNewChart = !chartInstance.current;
 
     if (shouldCreateNewChart) {
-      // Create chart instance with enhanced options
-      chartInstance.current = createChart(chartContainerRef.current, {
-        layout: {
-          background: { type: ColorType.Solid, color: 'transparent' },
-          textColor: 'rgba(255, 255, 255, 0.9)',
-          fontFamily: 'system-ui',
-        },
-        grid: {
-          vertLines: { color: 'rgba(255, 255, 255, 0.1)' },
-          horzLines: { color: 'rgba(255, 255, 255, 0.1)' },
-        },
-        width: chartContainerRef.current.clientWidth,
-        height: 400,
-        rightPriceScale: {
-          scaleMargins: {
-            top: 0.1,
-            bottom: 0.3,
-          },
-          borderVisible: false,
-          autoScale: true,
-        },
-        timeScale: {
-          borderVisible: false,
-          timeVisible: true,
-          secondsVisible: false,
-          rightOffset: 12,
-          barSpacing: 6,
-          fixLeftEdge: true,
-          lockVisibleTimeRangeOnResize: true,
-        },
-        crosshair: {
-          mode: 1,
-          vertLine: {
-            width: 1,
-            color: 'rgba(255, 255, 255, 0.4)',
-            style: 3,
-          },
-          horzLine: {
-            width: 1,
-            color: 'rgba(255, 255, 255, 0.4)',
-            style: 3,
-          },
-        },
-        handleScroll: {
-          mouseWheel: true,
-          pressedMouseMove: true,
-          horzTouchDrag: true,
-          vertTouchDrag: true,
-        },
-        handleScale: {
-          axisPressedMouseMove: true,
-          mouseWheel: true,
-          pinch: true,
-        },
-      }) as ExtendedChartApi;
-
+      console.log('Creating new chart instance');
       try {
+        // Import the library dynamically if needed
+        if (typeof createChart !== 'function') {
+          console.error('Chart library not properly loaded');
+          setError('Chart library not loaded. Please refresh the page.');
+          return;
+        }
+
+        // Create chart instance
+        const chart = createChart(chartContainerRef.current, {
+          layout: {
+            background: { type: ColorType.Solid, color: 'transparent' },
+            textColor: 'rgba(255, 255, 255, 0.9)',
+            fontFamily: 'system-ui',
+          },
+          grid: {
+            vertLines: { color: 'rgba(255, 255, 255, 0.1)' },
+            horzLines: { color: 'rgba(255, 255, 255, 0.1)' },
+          },
+          width: chartContainerRef.current.clientWidth,
+          height: 400,
+          rightPriceScale: {
+            scaleMargins: {
+              top: 0.1,
+              bottom: 0.3,
+            },
+            borderVisible: false,
+            autoScale: true,
+          },
+          timeScale: {
+            borderVisible: false,
+            timeVisible: true,
+            secondsVisible: false,
+            rightOffset: 12,
+            barSpacing: 6,
+            fixLeftEdge: true,
+            lockVisibleTimeRangeOnResize: true,
+          },
+          crosshair: {
+            mode: CrosshairMode.Normal,
+            vertLine: {
+              width: 1,
+              color: 'rgba(255, 255, 255, 0.4)',
+              style: 3,
+            },
+            horzLine: {
+              width: 1,
+              color: 'rgba(255, 255, 255, 0.4)',
+              style: 3,
+            },
+          },
+          handleScroll: {
+            mouseWheel: true,
+            pressedMouseMove: true,
+            horzTouchDrag: true,
+            vertTouchDrag: true,
+          },
+          handleScale: {
+            axisPressedMouseMove: true,
+            mouseWheel: true,
+            pinch: true,
+          },
+        });
+        
+        chartInstance.current = chart;
+
+        // Check if the chart methods exist before calling them
+        if (typeof chart.addSeries !== 'function') {
+          console.error('Chart method addSeries is not a function');
+          setError('Chart initialization failed. Please refresh the page.');
+          return;
+        }
+
         // Add candlestick series
-        candlestickSeries.current = chartInstance.current.addCandlestickSeries({
+        candlestickSeries.current = chart.addSeries(CandlestickSeries, {
           upColor: '#22c55e',
           downColor: '#ef4444',
           borderVisible: false,
@@ -203,7 +176,7 @@ export function PriceChart({ data: initialData, className, symbol }: PriceChartP
         });
 
         // Add volume series
-        volumeSeries.current = chartInstance.current.addHistogramSeries({
+        volumeSeries.current = chart.addSeries(HistogramSeries, {
           priceFormat: {
             type: 'volume',
           },
@@ -213,7 +186,7 @@ export function PriceChart({ data: initialData, className, symbol }: PriceChartP
         });
 
         // Configure volume scale
-        chartInstance.current.priceScale('volume').applyOptions({
+        chart.priceScale('volume').applyOptions({
           scaleMargins: {
             top: 0.7,
             bottom: 0,
@@ -221,20 +194,31 @@ export function PriceChart({ data: initialData, className, symbol }: PriceChartP
           visible: false,
         });
 
-        // Set up crosshair move handler
-        chartInstance.current.subscribeCrosshairMove((param) => {
+        // Set up crosshair move handler with proper type
+        chart.subscribeCrosshairMove((param: MouseEventParams) => {
           if (param.time && param.point) {
-            const seriesData = param.seriesData;
-            const price = seriesData.get(candlestickSeries.current) as SeriesData;
-            const volume = seriesData.get(volumeSeries.current) as SeriesData;
-            if (price) {
-              setLegendData({
-                open: price.open || 0,
-                high: price.high || 0,
-                low: price.low || 0,
-                close: price.close || 0,
-                volume: volume?.value || 0,
-              });
+            try {
+              const seriesData = param.seriesData;
+              if (candlestickSeries.current && volumeSeries.current) {
+                const candleData = seriesData.get(candlestickSeries.current);
+                const volumeData = seriesData.get(volumeSeries.current);
+                
+                if (candleData) {
+                  // Type assertion for the candlestick data
+                  const price = candleData as { open: number; high: number; low: number; close: number };
+                  const volume = volumeData as { value: number } || { value: 0 };
+                  
+                  setLegendData({
+                    open: price.open || 0,
+                    high: price.high || 0,
+                    low: price.low || 0,
+                    close: price.close || 0,
+                    volume: volume?.value || 0,
+                  });
+                }
+              }
+            } catch (err) {
+              console.error('Error processing crosshair data:', err);
             }
           } else {
             setLegendData(null);
@@ -244,66 +228,142 @@ export function PriceChart({ data: initialData, className, symbol }: PriceChartP
         // Set up resize observer
         resizeObserver.current = new ResizeObserver((entries) => {
           if (chartInstance.current && entries[0]) {
-            requestAnimationFrame(() => {
-              chartInstance.current?.applyOptions({
-                width: entries[0].contentRect.width,
-              });
-            });
+            const { width } = entries[0].contentRect;
+            chartInstance.current.applyOptions({ width });
           }
         });
 
-        resizeObserver.current.observe(chartContainerRef.current);
-      } catch (error) {
-        console.error('Error initializing chart series:', error);
+        if (chartContainerRef.current) {
+          resizeObserver.current.observe(chartContainerRef.current);
+        }
+        
+        console.log('Chart successfully initialized');
+      } catch (err) {
+        console.error('Error during chart initialization:', err);
         setError('Failed to initialize chart. Please try refreshing the page.');
       }
     }
 
     // Update data if we have it
-    if (data.length > 0 && candlestickSeries.current && volumeSeries.current) {
+    if (data.length > 0 && candlestickSeries.current && volumeSeries.current && chartInstance.current) {
       try {
+        console.log(`Setting chart data with ${data.length} points`);
+        
+        // Validate data points
+        const validData = data.filter(d => 
+          d && d.time && typeof d.open === 'number' && 
+          typeof d.high === 'number' && 
+          typeof d.low === 'number' && 
+          typeof d.close === 'number'
+        );
+        
+        if (validData.length === 0) {
+          console.error('No valid data points found');
+          setError('No valid price data available. Please try another timeframe.');
+          return;
+        }
+        
+        // Set candlestick data
         candlestickSeries.current.setData(
-          data.map((d) => ({
+          validData.map((d) => ({
             time: d.time,
             open: d.open,
             high: d.high,
             low: d.low,
             close: d.close,
-          }) as CandlestickData)
+          }))
         );
+        
+        // Set volume data
         volumeSeries.current.setData(
-          data.map((d) => ({
+          validData.map((d) => ({
             time: d.time,
             value: d.volume,
             color: d.close > d.open ? '#22c55e80' : '#ef444480',
-          }) as HistogramData)
+          }))
         );
-        chartInstance.current?.timeScale().fitContent();
+        
+        // Fit content to view
+        chartInstance.current.timeScale().fitContent();
+        console.log('Chart data successfully updated');
+        
       } catch (error) {
         console.error('Failed to update chart data:', error);
         setError('Failed to update chart. Please try refreshing the page.');
       }
+    } else if (data.length === 0) {
+      console.log('No data points available for chart');
+      setError('No historical data available for this timeframe');
     }
 
     return () => {
-      if (!isInitialMount.current) {
-        resizeObserver.current?.disconnect();
+      if (resizeObserver.current) {
+        resizeObserver.current.disconnect();
+      }
+      
+      if (chartInstance.current) {
+        console.log('Removing chart instance');
+        chartInstance.current.remove();
+        chartInstance.current = null;
+      }
+    };
+  }, [data]);
+
+  // Add a function to handle the initial loading errors
+  React.useEffect(() => {
+    // Add error retry logic for initialization issues
+    if (error) {
+      console.error('Chart initialization error:', error);
+      
+      // Create a function to handle retry
+      const retryInitialization = () => {
+        console.log('Retrying chart initialization...');
+        setError(null);
+        
+        // Force re-initialization on next render cycle
         if (chartInstance.current) {
           chartInstance.current.remove();
           chartInstance.current = null;
         }
+        
+        // Wait a moment before triggering re-render
+        setTimeout(() => {
+          setSelectedTimeframe(selectedTimeframe);
+        }, 500);
+      };
+      
+      // Auto-retry once
+      if (isInitialMount.current) {
+        isInitialMount.current = false;
+        retryInitialization();
       }
-      isInitialMount.current = false;
-    };
-  }, [data]);
+    }
+  }, [error, selectedTimeframe]);
+
+  // Add console debugging for data loading
+  React.useEffect(() => {
+    if (data.length > 0) {
+      console.log(`Chart data loaded for ${symbol} (${selectedTimeframe}):`, {
+        points: data.length,
+        firstPoint: data[0],
+        lastPoint: data[data.length - 1]
+      });
+    } else {
+      console.log(`No chart data available for ${symbol} (${selectedTimeframe})`);
+    }
+  }, [data, symbol, selectedTimeframe]);
 
   // Fetch new data when timeframe changes
   React.useEffect(() => {
+    console.log(`Fetching data for ${symbol} with timeframe ${selectedTimeframe}`);
+    
     async function fetchData() {
       try {
         setLoading(true);
         setError(null);
         const newData = await getHistoricalPrices(symbol, selectedTimeframe);
+
+        console.log(`Received ${newData?.length || 0} data points from API`);
 
         if (!newData || !Array.isArray(newData) || newData.length === 0) {
           setError('No historical data available for this timeframe');

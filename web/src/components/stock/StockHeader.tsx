@@ -12,6 +12,17 @@ interface StockHeaderProps {
   insights: AIAnalysisResponse;
 }
 
+// For debugging - log insights structure
+const debugInsights = (insights: AIAnalysisResponse) => {
+  console.log('AI Analysis insights:', {
+    hasData: !!insights,
+    sections: insights ? Object.keys(insights) : 'none',
+    sentimentScore: insights?.sentiment_score || 'none',
+    marketSummary: insights?.market_summary ? 'present' : 'missing',
+    technicalSignals: insights?.technical_signals ? 'present' : 'missing'
+  });
+};
+
 const sectionConfig = {
   market_summary: {
     icon: TrendingUp,
@@ -56,7 +67,25 @@ function getSentimentDetails(score: number) {
 export function StockHeader({ stockData, insights }: StockHeaderProps) {
   const { quote, profile } = stockData;
   const isPositiveChange = quote.change >= 0;
-  const sentiment = getSentimentDetails(insights.sentiment_score);
+  
+  // Debug output of insights
+  React.useEffect(() => {
+    debugInsights(insights);
+  }, [insights]);
+  
+  // Ensure we have insights or provide fallback
+  const safeInsights: AIAnalysisResponse = insights || {
+    market_summary: { content: 'No market summary available.', summary: 'Data unavailable.' },
+    trading_activity: { content: 'No trading activity analysis available.', summary: 'Data unavailable.' },
+    financial_health: { content: 'No financial health analysis available.', summary: 'Data unavailable.' },
+    technical_signals: { content: 'No technical signals analysis available.', summary: 'Data unavailable.' },
+    risk_factors: { content: 'No risk factor analysis available.', summary: 'Data unavailable.' },
+    growth_drivers: { content: 'No growth driver analysis available.', summary: 'Data unavailable.' },
+    sentiment_score: 50,
+    sentiment_explanation: 'No sentiment explanation available.'
+  };
+  
+  const sentiment = getSentimentDetails(safeInsights.sentiment_score);
 
   return (
     <section className='space-y-4'>
@@ -103,7 +132,7 @@ export function StockHeader({ stockData, insights }: StockHeaderProps) {
                 </div>
                 <div className='flex-1 min-w-[100px]'>
                   <div className='h-2 overflow-hidden rounded-full bg-muted/50'>
-                    <div className={cn('h-full transition-all duration-500', sentiment.color)} style={{ width: `${insights.sentiment_score}%` }} />
+                    <div className={cn('h-full transition-all duration-500', sentiment.color)} style={{ width: `${safeInsights.sentiment_score}%` }} />
                   </div>
                 </div>
               </div>
@@ -130,37 +159,45 @@ export function StockHeader({ stockData, insights }: StockHeaderProps) {
                 );
               })}
             </TabsList>
-            {Object.entries(sectionConfig).map(([key, section]) => (
-              <TabsContent key={key} value={key} className='mt-6 transition-all duration-300 ease-in-out'>
-                <div className='p-4 space-y-4 transition-colors duration-300 rounded-lg bg-gradient-to-br from-background/50 to-background hover:from-background/70 hover:to-background/50'>
-                  <div className='flex items-center gap-3 pb-4 border-b border-border/50'>
-                    <div className='p-2 rounded-md bg-primary/10'>
-                      <section.icon className='w-5 h-5 text-primary' />
+            {Object.entries(sectionConfig).map(([key, section]) => {
+              // Get the section data safely, with fallback
+              const sectionData = safeInsights[key as keyof typeof safeInsights] as AIAnalysisSection || 
+                { summary: 'No data available', content: 'Analysis could not be generated for this section.' };
+                
+              return (
+                <TabsContent key={key} value={key} className='mt-6 transition-all duration-300 ease-in-out'>
+                  <div className='p-4 space-y-4 transition-colors duration-300 rounded-lg bg-gradient-to-br from-background/50 to-background hover:from-background/70 hover:to-background/50'>
+                    <div className='flex items-center gap-3 pb-4 border-b border-border/50'>
+                      <div className='p-2 rounded-md bg-primary/10'>
+                        <section.icon className='w-5 h-5 text-primary' />
+                      </div>
+                      <div>
+                        <h4 className='text-lg font-semibold tracking-tight'>{section.title}</h4>
+                        <p className='text-sm text-muted-foreground/80'>{section.description}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className='text-lg font-semibold tracking-tight'>{section.title}</h4>
-                      <p className='text-sm text-muted-foreground/80'>{section.description}</p>
-                    </div>
-                  </div>
 
-                  <div className='pl-2 space-y-4'>
-                    <p
-                      className='text-lg font-medium leading-relaxed tracking-tight [&>strong]:font-semibold [&>strong]:text-primary/80'
-                      dangerouslySetInnerHTML={{
-                        __html: (insights[key as keyof Omit<AIAnalysisResponse, 'sentiment_score' | 'sentiment_explanation'>] as AIAnalysisSection).summary,
-                      }}
-                    />
-                    <div className='h-px bg-gradient-to-r from-border/50 via-border to-border/50' />
-                    <p
-                      className='text-sm text-muted-foreground leading-relaxed [&>strong]:font-semibold [&>strong]:text-primary/80'
-                      dangerouslySetInnerHTML={{
-                        __html: (insights[key as keyof Omit<AIAnalysisResponse, 'sentiment_score' | 'sentiment_explanation'>] as AIAnalysisSection).content,
-                      }}
-                    />
+                    <div className='pl-2 space-y-4'>
+                      {/* Display section summary */}
+                      <p
+                        className='text-lg font-medium leading-relaxed tracking-tight [&>strong]:font-semibold [&>strong]:text-primary/80'
+                        dangerouslySetInnerHTML={{
+                          __html: sectionData.summary || 'No summary available'
+                        }}
+                      />
+                      <div className='h-px bg-gradient-to-r from-border/50 via-border to-border/50' />
+                      {/* Display section content */}
+                      <p
+                        className='text-sm text-muted-foreground leading-relaxed [&>strong]:font-semibold [&>strong]:text-primary/80'
+                        dangerouslySetInnerHTML={{
+                          __html: sectionData.content || 'No content available'
+                        }}
+                      />
+                    </div>
                   </div>
-                </div>
-              </TabsContent>
-            ))}
+                </TabsContent>
+              );
+            })}
           </Tabs>
         </div>
       </Card>
